@@ -1,0 +1,101 @@
+CREATE DATABASE BookShopDB;
+
+USE BookShopDB;
+GO
+
+-- Роли
+CREATE TABLE Roles (
+    RoleID INT PRIMARY KEY IDENTITY(1,1),
+    RoleName NVARCHAR(50) NOT NULL UNIQUE
+);
+GO
+
+-- Пользователи
+CREATE TABLE Users (
+    UserID INT PRIMARY KEY IDENTITY(1,1),
+    FullName NVARCHAR(100) NOT NULL,
+    Login NVARCHAR(50) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(255) NOT NULL,
+    RoleID INT NOT NULL,
+    FOREIGN KEY (RoleID) REFERENCES Roles(RoleID)
+);
+GO
+
+-- Категории
+CREATE TABLE Categories (
+    CategoryID INT PRIMARY KEY IDENTITY(1,1),
+    CategoryName NVARCHAR(100) NOT NULL
+);
+GO
+
+-- Производители
+CREATE TABLE Manufacturers (
+    ManufacturerID INT PRIMARY KEY IDENTITY(1,1),
+    ManufacturerName NVARCHAR(100) NOT NULL
+);
+GO
+
+-- Поставщики
+CREATE TABLE Suppliers (
+    SupplierID INT PRIMARY KEY IDENTITY(1,1),
+    SupplierName NVARCHAR(100) NOT NULL
+);
+GO
+
+-- Справочник статусов заказов
+CREATE TABLE OrderStatuses (
+    StatusID INT PRIMARY KEY IDENTITY(1,1),
+    StatusName NVARCHAR(50) NOT NULL UNIQUE
+);
+GO
+
+-- Справочник пунктов выдачи
+CREATE TABLE PickupPoints (
+    PointID INT PRIMARY KEY IDENTITY(1,1),
+    Address NVARCHAR(255) NOT NULL UNIQUE
+);
+GO
+
+-- Товары
+CREATE TABLE Products (
+    ProductID INT PRIMARY KEY IDENTITY(1,1),
+    Article NVARCHAR(32) NOT NULL UNIQUE,
+    Name NVARCHAR(200) NOT NULL,
+    CategoryID INT NOT NULL,
+    Description NVARCHAR(MAX),
+    ManufacturerID INT NOT NULL,
+    SupplierID INT NOT NULL,
+    Price DECIMAL(18,2) NOT NULL CHECK (Price >= 0),
+    Unit NVARCHAR(20) NOT NULL,
+    StockQuantity INT NOT NULL CHECK (StockQuantity >= 0),
+    Discount DECIMAL(5,2) NOT NULL DEFAULT 0 CHECK (Discount >= 0 AND Discount <= 100),
+    ImagePath NVARCHAR(500),
+    FOREIGN KEY (CategoryID) REFERENCES Categories(CategoryID),
+    FOREIGN KEY (ManufacturerID) REFERENCES Manufacturers(ManufacturerID),
+    FOREIGN KEY (SupplierID) REFERENCES Suppliers(SupplierID)
+);
+GO
+
+-- Заказы
+CREATE TABLE Orders (
+    OrderID INT PRIMARY KEY IDENTITY(1,1),
+    OrderNumber NVARCHAR(32) NOT NULL,
+    StatusID INT NOT NULL,
+    PointID INT NOT NULL,
+    OrderDate DATETIME NOT NULL,
+    IssueDate DATETIME,
+    FOREIGN KEY (StatusID) REFERENCES OrderStatuses(StatusID),
+    FOREIGN KEY (PointID) REFERENCES PickupPoints(PointID)
+);
+GO
+
+-- Состав заказа
+CREATE TABLE OrderItems (
+    OrderItemID INT PRIMARY KEY IDENTITY(1,1),
+    OrderID INT NOT NULL,
+    ProductID INT NOT NULL,
+    Quantity INT NOT NULL CHECK (Quantity > 0),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID) ON DELETE CASCADE,
+    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
+);
+GO
