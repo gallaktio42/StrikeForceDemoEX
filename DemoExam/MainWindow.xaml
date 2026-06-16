@@ -1,0 +1,129 @@
+﻿<Window x:Class="DemoExam.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:DemoExam.Converters"
+        xmlns:local="clr-namespace:DemoExam"
+        mc:Ignorable="d"
+        Title="Магазин обуви" Height="600" Width="1000"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        <converters:ImagePathConverter x:Key="ImagePathConverter"/>
+        <converters:StringToVisibilityConverter x:Key="StringToVisibility"/>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Верхняя панель -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10" Background="{StaticResource SecondaryBackground}">
+            <Image Source="/Resources/icon.png" Stretch="UniformToFill" Margin="5,0,20,0" Height="104" Width="173" />
+            <TextBlock Text="Добро пожаловать, " VerticalAlignment="Center"/>
+            <TextBlock x:Name="lblUser" Text="" VerticalAlignment="Center" FontWeight="Bold" Margin="5,0"/>
+            <Button x:Name="btnLogout" Content="Выйти" Margin="20,0,0,0" Click="BtnLogout_Click" Height="60" Width="86"/>
+            <Button x:Name="btnOrders" Content="Заказы" Margin="10,0" Click="BtnOrders_Click" Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!--Панель поиска и фильтрации-->
+        <StackPanel x:Name="searchPanel" DockPanel.Dock="Top" Orientation="Horizontal" Margin="10" 
+                    Background="{StaticResource SecondaryBackground}" Visibility="Collapsed">
+            <TextBox x:Name="txtSearch" Width="200" Margin="5" TextChanged="TxtSearch_TextChanged" ToolTip="Поиск..."/>
+            <ComboBox x:Name="cmbSupplierFilter" Width="150" Margin="5" SelectionChanged="CmbSupplierFilter_SelectionChanged"/>
+            <ComboBox x:Name="cmbSortStock" Width="200" Margin="5" SelectionChanged="CmbSortStock_SelectionChanged">
+                <ComboBoxItem Content="Без сортировки"/>
+                <ComboBoxItem Content="По возрастанию остатка"/>
+                <ComboBoxItem Content="По убыванию остатка"/>
+            </ComboBox>
+            <Button x:Name="btnAddProduct" Content="Добавить" Width="80" Margin="6,0,0,0" Click="BtnAddProduct_Click" Visibility="Collapsed"/>
+            <Button x:Name="btnEditProduct" Content="Редактировать" Margin="6,0,0,0" Click="BtnEditProduct_Click" Visibility="Collapsed"/>
+            <Button x:Name="btnDeleteProduct" Content="Удалить" Width="80" Margin="6,0,0,0" Click="BtnDeleteProduct_Click" Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- DataGrid-->
+        <DataGrid x:Name="dgProducts" AutoGenerateColumns="False" IsReadOnly="True" Margin="10"
+                  SelectionMode="Single" MouseDoubleClick="DgProducts_MouseDoubleClick" SelectionChanged="DgProducts_SelectionChanged">
+
+            <DataGrid.Columns>
+                <!--Изображение -->
+                <DataGridTemplateColumn Header="" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image x:Name="ProductImage" Width="100" Height="80" Stretch="Uniform" Margin="5"
+                                   ImageFailed="ProductImage_ImageFailed">
+                                <Image.Source>
+                                    <Binding Path="ImagePath" Converter="{StaticResource ImagePathConverter}"/>
+                                </Image.Source>
+                            </Image>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- информация о товаре -->
+                <DataGridTemplateColumn Header="Информация о товаре" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="5">
+                                <!-- Наименование -->
+                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="16"/>
+                                <!-- Артикул -->
+                                <TextBlock Text="{Binding ArticleNumber}" FontSize="12" Foreground="Gray" Margin="0,2,0,0"/>
+                                <!-- Категория / Производитель / Поставщик -->
+                                <WrapPanel Margin="0,5,0,0">
+                                    <TextBlock Text="Категория: " FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Category.CategoryName}" Margin="0,0,15,0"/>
+                                    <TextBlock Text="Производитель: " FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Manufacturer.ManufacturerName}" Margin="0,0,15,0"/>
+                                    <TextBlock Text="Поставщик: " FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding Supplier.SupplierName}"/>
+                                </WrapPanel>
+                                <!-- Описание -->
+                                <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Margin="0,5,0,0" 
+                                           Visibility="{Binding Description, Converter={StaticResource StringToVisibility}}"/>
+                                <!-- Цена и остаток -->
+                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                                    <StackPanel.Resources>
+                                        <converters:BoolToVisibilityConverter x:Key="BoolToVis"/>
+                                    </StackPanel.Resources>
+                                    <!-- Старая цена -->
+                                    <TextBlock Text="{Binding Price, StringFormat={}{0:C}}" Foreground="Red" 
+                                               TextDecorations="Strikethrough" Margin="0,0,10,0"
+                                               Visibility="{Binding IsDiscountedMoreThan12, Converter={StaticResource BoolToVis}}"/>
+                                    <!-- Итоговая цена -->
+                                    <TextBlock Text="{Binding FinalPrice, StringFormat={}{0:C}}" FontWeight="Bold" Margin="0,0,15,0"/>
+                                    <TextBlock Text="Остаток: " FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding StockQuantity}" Margin="0,0,5,0"/>
+                                    <TextBlock Text="{Binding Unit}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <!-- Скидка -->
+                <DataGridTemplateColumn Header="Скидка" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding Discount, StringFormat={}{0:F0}%}" FontSize="18" FontWeight="Bold" 
+                                           Foreground="DarkOrange" TextAlignment="Center"/>
+                                <TextBlock Text="скидка" FontSize="10" Foreground="Gray" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Блок превью выбранного товара -->
+        <Border DockPanel.Dock="Bottom" Background="{StaticResource SecondaryBackground}" BorderBrush="Gray" BorderThickness="1" Margin="10,0,10,10" Padding="10">
+            <StackPanel Orientation="Horizontal">
+                <Image x:Name="imgSelectedProduct" ImageFailed="Img_ImageFailed" Width="150" Height="100" Stretch="Uniform" Margin="5"/>
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock Text="Выбранный товар:" FontWeight="Bold"/>
+                    <TextBlock x:Name="lblSelectedProductName" Text="(не выбран)" Margin="0,5,0,0"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </DockPanel>
+</Window>

@@ -1,0 +1,115 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Цветовые ресурсы -->
+    <SolidColorBrush x:Key="PrimaryBackground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SecondaryBackground" Color="#ABCFCE"/>
+    <SolidColorBrush x:Key="AccentColor" Color="#546F94"/>
+    <SolidColorBrush x:Key="DiscountHighlight" Color="#23E1EF"/>
+
+    <!-- Глобальный стиль для окон -->
+    <Style TargetType="Window">
+        <Setter Property="Background" Value="{StaticResource PrimaryBackground}"/>
+        <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+
+    <!-- Стиль кнопок с акцентом при наведении -->
+    <Style TargetType="Button">
+        <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Background" Value="{StaticResource SecondaryBackground}"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" Value="{StaticResource DiscountHighlight}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Стиль для TextBox -->
+    <Style TargetType="TextBox">
+        <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="BorderBrush" Value="{StaticResource SecondaryBackground}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="4"/>
+    </Style>
+    
+    <!-- Стиль для PasswordBox-->
+    <Style TargetType="PasswordBox">
+        <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="BorderBrush" Value="{StaticResource SecondaryBackground}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="4"/>
+    </Style>
+
+    <!-- Стиль для ComboBox-->
+    <Style TargetType="ComboBox">
+        <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Padding" Value="4"/>
+    </Style>
+
+    <!-- Стиль для элементов ComboBoxItem -->
+    <Style TargetType="ComboBoxItem">
+        <Setter Property="Background" Value="{StaticResource PrimaryBackground}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Стиль для TextBlock -->
+    <Style TargetType="TextBlock" x:Key="TitleTextBlock">
+        <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource AccentColor}"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+    </Style>
+
+    <!-- Стиль для Label -->
+    <Style TargetType="Label">
+        <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Стиль для DataGrid -->
+    <Style TargetType="DataGrid">
+        <Setter Property="FontFamily" Value="Comic Sans MS"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="AlternatingRowBackground" Value="#FFF5F5F5"/>
+        <Setter Property="HeadersVisibility" Value="Column"/>
+    </Style>
+
+    <!-- Стиль для строк DataGrid: подсветка скидки >12%, остатка 0 и наведение мыши -->
+    <Style TargetType="DataGridRow">
+        <Style.Triggers>
+            <!-- Скидка >12% -->
+            <DataTrigger Binding="{Binding IsDiscountedMoreThan25}" Value="True">
+                <Setter Property="Background" Value="{StaticResource DiscountHighlight}"/>
+            </DataTrigger>
+            <!-- Нет в наличии -->
+            <DataTrigger Binding="{Binding IsOutOfStock}" Value="True">
+                <Setter Property="Background" Value="Gray"/>
+            </DataTrigger>
+            <!-- Наведение мыши (акцент) -->
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource AccentColor}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Стиль для главного окна (иконка) -->
+    <Style TargetType="Window" x:Key="MainWindowStyle" BasedOn="{StaticResource {x:Type Window}}">
+        <Setter Property="Icon" Value="/Resources/icon.ico"/>
+    </Style>
+</ResourceDictionary>
